@@ -1,5 +1,9 @@
 from flask import Flask, render_template
 
+from .domain.config import Config
+
+config = Config().get()
+
 app = Flask(__name__)
 
 
@@ -13,5 +17,9 @@ def book_new_trade():
     return render_template('book-trade.html')
 
 
-if __name__ == "__main__":
-    app.run(port=8081, debug=True)
+# Expose the Flask App so WSGI server can access it
+flask_app = app
+
+if __name__ == 'main':
+    # If just running manually outside of WSGI server, run the app
+    app.run(port=config.getint('app', 'port'))

@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: gunicorn -b 0.0.0.0:8080 -w 2 trading_app.api_server:flask_app
+    env_file:
+      - ./.env.api
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config:/config
+      - .:/database
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: gunicorn -b 0.0.0.0:8080 -w 2 trading_app.web_client:flask_app
+    env_file:
+      - ./.env.web
+    ports:
+      - 8081:8080
+    volumes:
+      - ./config:/config
