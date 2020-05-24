@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}All Booked Trades{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div align="right">
+    <input type="button" onclick="location.href='/book-trade';" value="New Trade"/>
+</div>
+<div>
+    <table id="all-booked-trades" class="display" style="width: 100%">
+        <thead>
+        <tr>
+            <th>Sell CCY</th>
+            <th>Sell Amount</th>
+            <th>Buy CCY</th>
+            <th>Buy Amount</th>
+            <th>Rate</th>
+            <th>Date Booked</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#all-booked-trades').DataTable( {
+            "ajax": {
+                "url": "http://localhost:8080/api/v1/trade",
+                "dataSrc": ''
+            },
+            "columns": [
+                { "data": "sell_currency" },
+                { "data": "sell_amount", render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+                { "data": "buy_currency" },
+                { "data": "buy_amount", render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+                { "data": "rate", render: $.fn.dataTable.render.number( ',', '.', 4, '' ) },
+                { "data": "date_booked", render: $.fn.dataTable.render.moment(
+                    'YYYY-MM-DDTHH:mm:ss.SSSSSSZ', 'DD/MM/YYYY HH:mm'
+                )}
+            ]
+        } );
+    } );
+
+</script>
+{% endblock %}

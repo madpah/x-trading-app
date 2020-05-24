@@ -1,0 +1,162 @@
+openapi: 3.0.1
+info:
+  title: Trading App API
+  version: 1.0.0
+
+servers:
+- url: http://localhost/api/v1
+
+paths:
+  /currency:
+    get:
+      summary: Get supported currencies
+      operationId: trading_app.controllers.api.get_currencies
+      parameters:
+        - name: term
+          in: query
+          description: Search string to narrow results
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Currencies returned
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  $ref: '#/components/schemas/CurrencyCode'
+
+  /rate:
+    post:
+      summary: Get current trade rate
+      operationId: trading_app.controllers.api.get_trade_rate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeRateRequest'
+      responses:
+        200:
+          description: Trade rate response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeRateResponse'
+
+  /trade:
+    get:
+      summary: Get all booked trades
+      operationId: trading_app.controllers.api.get_booked_trades
+      responses:
+        200:
+          description: Trades returned
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  $ref: '#/components/schemas/BookedTrade'
+        204:
+          description: No trades to return
+          content: {}
+    post:
+      summary: Book a trade
+      operationId: trading_app.controllers.api.book_new_trade
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/TradeRateResponse'
+                - type: object
+                  required:
+                    - sell_amount
+                    - buy_amount
+                    - rate
+                  properties:
+                    sell_amount:
+                      $ref: '#/components/schemas/CurrencyAmount'
+                    buy_amount:
+                      $ref: '#/components/schemas/CurrencyAmount'
+                    rate:
+                      $ref: '#/components/schemas/ExchangeRate'
+      responses:
+        201:
+          description: Trade booked
+          content:
+            appliction/json:
+              schema:
+                $ref: '#/components/schemas/BookedTrade'
+
+components:
+  schemas:
+    BookedTrade:
+      type: object
+      required:
+        - id
+        - sell_currency
+        - sell_amount
+        - buy_currency
+        - buy_amount
+        - rate
+        - date_booked
+      properties:
+        id:
+          type: string
+          pattern: '^TR[0-9A-Z]{7}$'
+          example: TR428YR1O
+        sell_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        sell_amount:
+          $ref: '#/components/schemas/CurrencyAmount'
+        buy_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        buy_amount:
+          $ref: '#/components/schemas/CurrencyAmount'
+        rate:
+          $ref: '#/components/schemas/ExchangeRate'
+        date_booked:
+          type: string
+          format: date-time
+
+    CurrencyAmount:
+      type: number
+      format: double
+      nullable: false
+      example: 100.00
+
+    CurrencyCode:
+      type: string
+      pattern: '^[A-Z]{3}$'
+      example: USD
+
+    ExchangeRate:
+      type: number
+      format: double
+      nullable: false
+      example: 1.0235
+
+    TradeRateRequest:
+      type: object
+      required:
+        - sell_currency
+        - buy_currency
+      properties:
+        sell_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        buy_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+
+    TradeRateResponse:
+      allOf:
+        - $ref: '#/components/schemas/TradeRateRequest'
+        - type: object
+          required:
+            - rate
+          properties:
+            rate:
+              $ref: '#/components/schemas/ExchangeRate'

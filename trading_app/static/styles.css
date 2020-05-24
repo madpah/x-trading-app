@@ -1,0 +1,19 @@
+BODY  {
+    font-family: Verdana, Geneva, sans-serif;
+    word-spacing: 2px;
+    color: #000000;
+    font-weight: normal;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+}
+
+H1 {
+    border-bottom: 1px solid #000000;
+    font-size: 25px;
+}
+
+#book-trade DIV.row > DIV {
+    float: left;
+}

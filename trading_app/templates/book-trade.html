@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Book a new Trade{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<div id="book-trade">
+    <form id="frm-book-trade" action="http://localhost:8080/api/v1/trade" method="post">
+        <div class="row">
+            <div style="width: 30%" align="center">
+                Sell Currency<br />
+                <input id="sell-currency" type="hidden" />
+                <input id="sell-currency-autocomplete" class="currency-autocomplete" /><br />
+                Sell Amount<br />
+                <input id="sell-amount" type="text" />
+            </div>
+            <div style="width: 5%" align="center">
+                &#9654;
+            </div>
+            <div style="width: 30%" align="center">
+                Rate<br />
+                <input id="exchange-rate" type="text" readonly="readonly" />
+            </div>
+            <div style="width: 5%" align="center">
+                &#9654;
+            </div>
+            <div style="width: 30%" align="center">
+                Buy Currency<br />
+                <input id="buy-currency" type="hidden" />
+                <input id="buy-currency-autocomplete" class="currency-autocomplete" /><br />
+                Buy Amount<br />
+                <input id="buy-amount" type="text" readonly="readonly" />
+            </div>
+        </div>
+        <div class="row">
+            <div style="width: 50%" align="left">
+                <input id="btn-create-trade" type="submit" value="Create" />
+            </div>
+            <div style="width: 50%" align="right">
+                <button onclick="window.location='/'">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#frm-book-trade INPUT.currency-autocomplete").autocomplete({
+            source: "http://127.0.0.1:8080/api/v1/currency",
+            minLength: 1,
+            select: function( event, ui ) {
+                var target_hidden = event.target.id.replace('-autocomplete', '');
+                $('#' + target_hidden).val(ui.item.value);
+                get_exchange_rate();
+            }
+        });
+
+        $("#frm-book-trade").submit(function( event ) {
+            event.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:8080/api/v1/trade",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "sell_currency": $('#sell-currency').val(),
+                    "sell_amount": parseFloat($('#sell-amount').val()),
+                    "buy_currency": $('#buy-currency').val(),
+                    "buy_amount": parseFloat($('#buy-amount').val()),
+                    "rate": parseFloat($('#exchange-rate').val())
+                }),
+                statusCode: {
+                    201: handle_trade_booked_success
+                },
+                dataType: 'json'
+            });
+        });
+    } );
+
+    function handle_trade_booked_success(data, status, xhr) {
+        console.log("Trade registered successfully.");
+        window.location.href='/';
+    }
+
+    function get_exchange_rate() {
+        var sell_currency = $('#sell-currency').val()
+        var buy_currency = $('#buy-currency').val()
+
+        // Ensure we have both currencies selected
+        console.log("Get Exchange Rate for: " + sell_currency + ", " + buy_currency)
+        if (sell_currency && buy_currency) {
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:8080/api/v1/rate",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "sell_currency": sell_currency,
+                    "buy_currency": buy_currency
+                }),
+                success: function(data, status, xhr) {
+                    set_exchange_rate(data.rate);
+                },
+                dataType: 'json'
+            });
+        }
+    }
+
+    function set_exchange_rate(rate) {
+        $('#exchange-rate').val(rate);
+        update_buy_amount();
+    }
+
+    function update_buy_amount() {
+        var sell_amount = $('#sell-amount').val();
+        var rate = $('#exchange-rate').val();
+
+        if (sell_amount && rate) {
+            var buy_amount = (parseFloat(sell_amount) * parseFloat(rate)).toFixed(2);
+            $('#buy-amount').val(buy_amount);
+        }
+    }
+
+</script>
+{% endblock %}
