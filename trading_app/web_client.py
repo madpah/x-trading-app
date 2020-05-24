@@ -1,6 +1,10 @@
+import logging
 from flask import Flask, render_template
 
 from .domain.config import Config
+
+FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+logging.basicConfig(format=FORMAT)
 
 config = Config().get()
 

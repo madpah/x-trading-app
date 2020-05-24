@@ -1,8 +1,11 @@
+import logging
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from trading_app.domain.config import Config
+
+logger = logging.getLogger('trading_app')
 
 
 class DatabaseConnector:
@@ -19,6 +22,7 @@ class DatabaseConnector:
 
         def _ensure_tables_exist(self):
             if not self.engine.dialect.has_table(self.engine, 'tblTrade'):  # If table don't exist, Create.
+                logger.info('tblTrade does not exist in database - creating it now')
                 from ..model.base import Base
                 from ..model.model import Trade  # noqa: F401
                 Base.metadata.create_all(bind=self.engine)

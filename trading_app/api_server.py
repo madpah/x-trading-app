@@ -1,7 +1,11 @@
 import connexion
+import logging
 from flask_cors import CORS
 
 from .domain.config import Config
+
+FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+logging.basicConfig(format=FORMAT)
 
 config = Config().get()
 

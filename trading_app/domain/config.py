@@ -1,5 +1,8 @@
+import logging
 import os
 from configparser import RawConfigParser
+
+logger = logging.getLogger('trading_app')
 
 
 class Config:
@@ -8,9 +11,11 @@ class Config:
             config_file_path = os.getenv('CONFIG_FILE')
 
             if not config_file_path:
+                logger.error('No CONFIG_FILE environment varaible supplied, or it was NULL')
                 raise NoConfigFileSuppliedException
 
             if not os.path.exists(config_file_path):
+                logger.error('The config file supplied ({}) does not exist'.format(config_file_path))
                 raise ConfigFileDoesNotExistException
 
             with open(config_file_path, 'r') as raw_config_file:
