@@ -22,4 +22,4 @@ flask_app = app
 
 if __name__ == 'main':
     # If just running manually outside of WSGI server, run the app
-    app.run(port=config.getint('app', 'port'))
+    app.run(port=config.getint('app', 'port'), debug=config.getboolean('app', 'debug'))
