@@ -36,7 +36,9 @@ CONFIG_FILE=/path/to/config.ini python /your/path/to/trading_app/api_server.py
 CONFIG_FILE=/path/to/config.ini python /your/path/to/trading_app/web_client.py
 ```
 
-###
+## Testing
+
+All tests, linting and coverage are wrapped up with Tox. To run, invoke `tox`.
 
 ## Configuration
 

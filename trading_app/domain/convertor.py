@@ -1,4 +1,4 @@
-from decimal import *
+from decimal import getcontext, Decimal
 
 
 def convert_currency(amount: float, rate: float):

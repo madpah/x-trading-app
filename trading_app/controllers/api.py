@@ -1,5 +1,4 @@
 from copy import copy
-from decimal import *
 from json import dumps
 
 from flask import Response
@@ -12,7 +11,6 @@ from ..domain.fixer import FixerIOClient
 from ..model.model import Trade
 
 fixer_client = FixerIOClient(access_key=Config().get().get('fixer', 'access_key'))
-getcontext().prec = 2
 
 
 def get_currencies(term: str = None):
@@ -29,7 +27,6 @@ def get_trade_rate(body: dict):
     )
 
     response_object = copy(body)
-    # response_object['buy_amount'] = float(convert_currency(amount=body['sell_amount'], rate=current_rate))
     response_object['rate'] = current_rate
 
     return _make_json_response(response_object=response_object)
@@ -43,8 +40,6 @@ def get_booked_trades():
     for trade in q:
         responses.append(_map_trade_to_dict(trade=trade))
 
-    print("Responses: {}".format(responses))
-
     return _make_json_response(response_object=responses)
 
 
@@ -53,8 +48,7 @@ def book_new_trade(body: dict):
     try:
         s.add(_map_json_to_trade_v1(json=body))
         s.commit()
-    except Exception as e:
-        print("Exception: {}".format(e))
+    except Exception:
         return _make_empty_response(500)
 
     return _make_empty_response(return_code=201)

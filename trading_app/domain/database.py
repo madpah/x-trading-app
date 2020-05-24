@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -18,11 +18,9 @@ class DatabaseConnector:
             self._ensure_tables_exist()
 
         def _ensure_tables_exist(self):
-            print("Ensuring database tables exists...")
             if not self.engine.dialect.has_table(self.engine, 'tblTrade'):  # If table don't exist, Create.
-                print("Creating Trade table")
                 from ..model.base import Base
-                from ..model.model import Trade
+                from ..model.model import Trade  # noqa: F401
                 Base.metadata.create_all(bind=self.engine)
 
         def get_engine(self) -> Engine:
